@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            //description
+            $table->text('description')->nullable();
+            //price
+            $table->integer('price')->default(0);
+            //stock
+            $table->integer('stock')->default(0);
+            //category enum
+            $table->enum('category', ['food', 'drink', 'snack']);
+            //image
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

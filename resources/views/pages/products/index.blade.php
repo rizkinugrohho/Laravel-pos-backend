@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users')
+@section('title', 'Products')
 
 @push('style')
 <!-- CSS Libraries -->
@@ -11,14 +11,14 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>Users</h1>
+            <h1>Products</h1>
             <div class="section-header-button">
-                <a href="{{ route('user.create') }}" class="btn btn-primary">Tambah User</a>
+                <a href="{{ route('product.create') }}" class="btn btn-primary">Add New</a>
             </div>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="{{ route('home') }}">Dashboard</a></div>
-                <div class="breadcrumb-item"><a href="{{ route('user.index') }}">Users</a></div>
-                <div class="breadcrumb-item">Data Users</div>
+                <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+                <div class="breadcrumb-item"><a href="#">Products</a></div>
+                <div class="breadcrumb-item">All Products</div>
             </div>
         </div>
         <div class="section-body">
@@ -27,12 +27,17 @@
                     @include('layouts.alert')
                 </div>
             </div>
-            <h2 class="section-title">Users</h2>
+            <h2 class="section-title">Products</h2>
+            <p class="section-lead">
+                You can manage all Products, such as editing, deleting and more.
+            </p>
+
+
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Data Users</h4>
+                            <h4>All Products</h4>
                         </div>
                         <div class="card-body">
                             <div class="float-left">
@@ -44,9 +49,9 @@
                                 </select>
                             </div>
                             <div class="float-right">
-                                <form method="GET" action="{{ route('user.index') }}">
+                                <form method="GET" action="{{ route('product.index') }}">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Search" name="name" value="{{ request()->input('name') }}">
+                                        <input type="text" class="form-control" placeholder="Search" name="name">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                         </div>
@@ -59,43 +64,59 @@
                             <div class="table-responsive">
                                 <table class="table-striped table">
                                     <tr>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>Nomor HP</th>
-                                        <th>Tanggal</th>
-                                        <th>Aksi</th>
+
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Photo</th>
+                                        <th>Created At</th>
+                                        <th>Action</th>
                                     </tr>
-                                    @foreach ($users as $user)
+                                    @foreach ($products as $product)
                                     <tr>
-                                        <td>{{ $user->name }}
-                                        </td>
-                                        <td>{{ $user->email }}
-                                        </td>
-                                        <td>{{ $user->phone }}
-                                        </td>
-                                        <td>{{ $user->created_at }}
+
+                                        <td>{{ $product->name }}
                                         </td>
                                         <td>
+                                            {{ $product->category }}
+                                        </td>
+                                        <td>
+                                            {{ $product->price }}
+                                        </td>
+                                        <td>
+                                            @if ($product->image)
+                                            <img src="{{ asset('storage/products/'.$product->image) }}" alt="" width="100px" class="img-thumbnail">
+                                            @else
+                                            <span class="badge badge-danger">No Image</span>
+
+                                            @endif
+
+                                        </td>
+                                        <td>{{ $product->created_at }}</td>
+                                        <td>
                                             <div class="d-flex justify-content-center">
-                                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-info btn-icon">
-                                                    <i class="fas fa-edit"></i>Edit</a>
+                                                <a href='{{ route('product.edit', $product->id) }}' class="btn btn-sm btn-info btn-icon">
+                                                    <i class="fas fa-edit"></i>
+                                                    Edit
+                                                </a>
 
-
-                                                <form id="delete-user-{{ $user->id }}" action="{{ route('user.destroy', $user->id) }}" method="POST" class="ml-2">
+                                                <form id="delete-form-{{ $product->id }}" action="{{ route('product.destroy', $product->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" class="btn btn-sm btn-danger btn-icon" onclick="confirmDeleteUser({{ $user->id }})">
-                                                        <i class="fas fa-trash"></i>Hapus
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $product->id }})">
+                                                        Delete
                                                     </button>
                                                 </form>
                                             </div>
                                         </td>
                                     </tr>
                                     @endforeach
+
+
                                 </table>
                             </div>
                             <div class="float-right">
-                                {{ $users->withQueryString()->links() }}
+                                {{ $products->withQueryString()->links() }}
                             </div>
                         </div>
                     </div>
@@ -112,22 +133,19 @@
 
 <!-- Page Specific JS File -->
 <script src="{{ asset('js/page/features-posts.js') }}"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-function confirmDeleteUser(id) {
+function confirmDelete(id) {
     Swal.fire({
         title: 'Apakah Kamu Yakin?',
-        text: "Ingin menghapus data user ini!",
+        text: "Ingin menghapus data product ini!",
         icon: 'warning',
         showCancelButton: true,
-        // confirmButtonColor: '#d33',
         confirmButtonText: 'Ya, hapus!',
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            document.getElementById('delete-user-' + id).submit();
+            document.getElementById('delete-form-' + id).submit();
         }
     });
 }

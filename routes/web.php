@@ -24,4 +24,5 @@ Route::middleware(['auth'])->group(function() {
     })->name('home');
 
     Route::resource('user', UserController::class);
+    Route::resource('product', \App\Http\Controllers\ProductController::class);
 });
